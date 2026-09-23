@@ -425,3 +425,332 @@ body {
     opacity: 1;
   }
 }
+
+/* ===== 作戦提案機能 ===== */
+
+/* 作戦提案ボタン(ツールバー内・呼出の右) */
+.tb.strategy {
+  background: linear-gradient(135deg, #7b5cff, #4a8cff);
+  border-color: transparent;
+  color: #fff;
+  font-weight: 700;
+}
+.tb.strategy:active {
+  transform: translateY(1px);
+}
+
+/* 条件設定モーダル */
+.cond-modal h3,
+.result-modal h2 {
+  margin: 0;
+}
+.cond-section {
+  border-top: 1px solid #1c5a45;
+  padding: 12px 0;
+}
+.cond-section:first-of-type {
+  border-top: none;
+  padding-top: 4px;
+}
+.cond-section h3 {
+  font-size: 14px;
+  margin: 0 0 8px;
+  color: var(--muted);
+}
+.cond-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 44px;
+}
+.cond-key {
+  font-size: 14px;
+  color: var(--text);
+  flex: 0 0 auto;
+}
+.cond-score {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* ステッパー */
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.stepper-label {
+  font-size: 13px;
+  color: var(--muted);
+  min-width: 22px;
+}
+.stepper-value {
+  min-width: 30px;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+/* セグメント(先攻後攻 / リスク) */
+.seg {
+  display: flex;
+  gap: 0;
+  border: 1px solid #1c5a45;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.seg-btn {
+  flex: 1;
+  min-height: 40px;
+  padding: 0 12px;
+  border: none;
+  background: var(--panel-2);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.seg-btn + .seg-btn {
+  border-left: 1px solid #1c5a45;
+}
+.seg-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* 目的のラジオリスト */
+.radio-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.radio-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 4px 10px;
+  border: 1px solid #1c5a45;
+  border-radius: 8px;
+  background: var(--panel-2);
+  font-size: 14px;
+  cursor: pointer;
+}
+.radio-item.sel {
+  border-color: var(--accent);
+  background: #12503a;
+}
+.radio-item input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+/* アイスコンディション */
+.disclosure {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 4px 0;
+  min-height: 40px;
+  text-align: left;
+}
+.ice-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
+}
+.ice-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.ice-grid select,
+.ice-grid input,
+.field input {
+  min-height: 42px;
+  border-radius: 8px;
+  border: 1px solid #1c5a45;
+  background: var(--panel-2);
+  color: var(--text);
+  padding: 4px 10px;
+  font-size: 15px;
+}
+
+/* 条件モーダルのアクション行 */
+.cond-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.cond-actions-main {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  text-decoration: underline;
+  font-size: 13px;
+  min-height: 44px;
+}
+.close-btn {
+  width: auto;
+  padding: 0 18px;
+}
+.close-btn.ghost {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid #1c5a45;
+}
+.close-btn.ghost:disabled {
+  opacity: 0.5;
+}
+
+/* 結果モーダル */
+.result-note {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+.advisory {
+  font-size: 13px;
+  color: #ffd98a;
+  background: rgba(255, 200, 90, 0.12);
+  border: 1px solid rgba(255, 200, 90, 0.4);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 0 0 12px;
+}
+.proposal-list {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.proposal-card {
+  border: 1px solid #1c5a45;
+  border-radius: 12px;
+  background: var(--panel-2);
+  overflow: hidden;
+}
+.proposal-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  background: none;
+  border: none;
+  color: var(--text);
+  text-align: left;
+  min-height: 56px;
+}
+.proposal-head-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.proposal-index {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+.proposal-cat {
+  font-size: 11px;
+  color: var(--muted);
+}
+.proposal-title {
+  font-size: 15px;
+  font-weight: 700;
+}
+.proposal-head-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.risk-stars {
+  color: #ffcf5a;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+.chev {
+  color: var(--muted);
+  font-size: 11px;
+}
+.proposal-detail {
+  border-top: 1px solid #1c5a45;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.detail-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.detail-label {
+  font-size: 11px;
+  color: var(--muted);
+}
+.detail-value {
+  font-size: 14px;
+  line-height: 1.4;
+}
+.apply-btn {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* AI接続設定 */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+/* 残り石(自動表示) */
+.cond-remain {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* 目的ドロップダウン */
+.objective-select {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 8px;
+  border: 1px solid #1c5a45;
+  background: var(--panel-2);
+  color: var(--text);
+  padding: 4px 10px;
+  font-size: 15px;
+}

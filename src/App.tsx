@@ -13,16 +13,30 @@ import { TeamNameInput } from "./TeamNameInput";
 import {
   createEmptyBoard,
   MAX_STONES_PER_TEAM,
+  newId,
   SHOT_COLORS,
   SHOT_LABELS,
+  STONES_PER_END,
   type Board,
   type BoardState,
   type Direction,
   type Hammer,
+  type MaxEnds,
+  type Shot,
   type ShotType,
   type Stone,
   type Team,
 } from "./types";
+import { ConditionModal } from "./strategy/ConditionModal";
+import { ResultModal } from "./strategy/ResultModal";
+import { SettingsModal } from "./strategy/SettingsModal";
+import { requestStrategy, StrategyError } from "./strategy/client";
+import {
+  computeRemainingStones,
+  type StrategyConditions,
+  type StrategyProposal,
+  type StrategyResult,
+} from "./strategy/types";
 
 function stateFromBoard(b: Board): BoardState {
   return {
@@ -59,6 +73,16 @@ export default function App() {
   const [savedBoards, setSavedBoards] = useState<Board[]>([]);
   const [toast, setToast] = useState<string | null>(null);
   const [teamNames, setTeamNames] = useState<string[]>(() => listTeamNames());
+
+  // --- 作戦提案機能 ---
+  const [strategyStage, setStrategyStage] = useState<
+    "closed" | "condition" | "result"
+  >("closed");
+  const [strategyLoading, setStrategyLoading] = useState(false);
+  const [strategyResult, setStrategyResult] = useState<StrategyResult | null>(
+    null
+  );
+  const [showAiSettings, setShowAiSettings] = useState(false);
 
   const flash = useCallback((msg: string) => {
     setToast(msg);
@@ -201,6 +225,69 @@ export default function App() {
     if (!window.confirm("この局面を削除しますか?")) return;
     deleteBoard(id);
     setSavedBoards(listBoards());
+  }
+
+  // --- 作戦提案 ---
+  // 条件ポップアップの初期値を現在の局面から推定する。
+  function buildInitialConditions(): StrategyConditions {
+    // 何投目かは盤面の配置済み石数から推定(自チームが次に投げる投数)。
+    const placed = Math.max(ownCount, oppCount);
+    const shotNumber = Math.min(
+      STONES_PER_END,
+      Math.max(1, placed + 1)
+    );
+    const maxEnds: MaxEnds = 8; // 既定は8エンド制
+    return {
+      maxEnds,
+      end: Math.min(maxEnds, state.end),
+      score: { own: 0, opponent: 0 },
+      hammer: state.hammer,
+      shotNumber,
+      remainingStones: computeRemainingStones(shotNumber, state.hammer),
+      objective: "auto",
+      riskLevel: "normal",
+      ice: { curl: "unknown", weight: "unknown" },
+    };
+  }
+
+  function openStrategy() {
+    if (state.stones.length === 0) {
+      flash("先にストーンを配置してください");
+      return;
+    }
+    setStrategyStage("condition");
+  }
+
+  async function handleStrategySubmit(cond: StrategyConditions) {
+    setStrategyLoading(true);
+    try {
+      const result = await requestStrategy(state.stones, cond);
+      setStrategyResult(result);
+      setStrategyStage("result");
+    } catch (e) {
+      if (e instanceof StrategyError) {
+        flash(e.message.replace(/\n/g, " "));
+      } else {
+        flash("作戦提案を取得できませんでした");
+      }
+    } finally {
+      setStrategyLoading(false);
+    }
+  }
+
+  // 提案をボードへ反映(仕様 17)。from→target の軌道を1本追加する。
+  function applyProposal(p: StrategyProposal) {
+    const target = p.target ?? { x: 50, y: 40 };
+    const from = p.from ?? { x: 50, y: 98 };
+    const shot: Shot = {
+      id: newId("shot"),
+      type: p.shotType,
+      points: [from, target],
+    };
+    commitShots((prev) => [...prev, shot]);
+    setStrategyStage("closed");
+    setStrategyResult(null);
+    flash(`「${p.title}」をボードに表示しました`);
   }
 
   // キーボードショートカット(PC確認用)
@@ -362,6 +449,9 @@ export default function App() {
         <button className="tb" onClick={openBoards}>
           <span className="ico">📂</span>呼出
         </button>
+        <button className="tb strategy" onClick={openStrategy}>
+          <span className="ico">🧠</span>作戦提案
+        </button>
       </footer>
 
       {/* 局面一覧モーダル */}
@@ -406,6 +496,40 @@ export default function App() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* 作戦提案: 条件設定 */}
+      {strategyStage === "condition" && (
+        <ConditionModal
+          initial={buildInitialConditions()}
+          loading={strategyLoading}
+          onCancel={() => setStrategyStage("closed")}
+          onSubmit={handleStrategySubmit}
+          onOpenSettings={() => setShowAiSettings(true)}
+        />
+      )}
+
+      {/* 作戦提案: 結果 */}
+      {strategyStage === "result" && strategyResult && (
+        <ResultModal
+          result={strategyResult}
+          onClose={() => {
+            setStrategyStage("closed");
+            setStrategyResult(null);
+          }}
+          onApply={applyProposal}
+        />
+      )}
+
+      {/* AI接続設定 */}
+      {showAiSettings && (
+        <SettingsModal
+          onClose={() => setShowAiSettings(false)}
+          onSaved={() => {
+            setShowAiSettings(false);
+            flash("AI接続設定を保存しました");
+          }}
+        />
       )}
 
       {toast && <div className="toast">{toast}</div>}

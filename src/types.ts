@@ -7,6 +7,13 @@
 // 1チームがシート上に置ける石の最大数(カーリングのルール)
 export const MAX_STONES_PER_TEAM = 8;
 
+// 1エンドあたりの各チームの投球数(残り石算出に使用)
+export const STONES_PER_END = 8;
+
+// 試合形式ごとの最大エンド数(6/8/10エンド制)
+export const MAX_ENDS_OPTIONS = [6, 8, 10] as const;
+export type MaxEnds = (typeof MAX_ENDS_OPTIONS)[number];
+
 export type Team = "own" | "opp";
 export type Direction = "down" | "up";
 export type Hammer = "own" | "opp";
