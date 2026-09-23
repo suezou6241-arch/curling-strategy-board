@@ -7,22 +7,18 @@ export const SHEET = {
   left: 8,
   right: 92,
   // 縦方向のライン位置(y)
-  // ハウスをやや小さくし中心を上げ、ティーライン〜ホグラインのフリーガードゾーンを広く取る。
-  hackTop: 2, // 遠端側ハック(相手側)
-  backLineTop: 5, // ハウス外周上端(y=5)と接する
-  teeLineTop: 32, // 遠端ティーライン(ハウス中心)
-  hogLineTop: 75, // 遠端ホグライン(FGZ = ティーライン〜ホグライン)
-  hogLineBottom: 90, // 投球側ホグライン
-  teeLineBottom: 32, // (未使用)
-  hackBottom: 98, // 投球側ハック
-  // ハウス(遠端側)中心とリングサイズ
+  // フリーガードゾーンより手前(投球側)は表示せず、ハウス〜ホグラインまでを画面いっぱいに描く。
+  backLineTop: 6, // ハウス外周上端と接するバックライン
+  teeLineTop: 40, // ティーライン(ハウス中心)
+  hogLineTop: 94, // ホグライン(FGZ = ティーライン〜ホグライン、下端付近)
+  // ハウス中心とリングサイズ
   houseCenterX: 50,
-  houseCenterY: 32,
+  houseCenterY: 40,
   houseRadii: {
-    twelveFoot: 27, // 一番外側の青(37.5→27に縮小、FGZを広げるため)
-    eightFoot: 18,
-    fourFoot: 10,
-    button: 3.6,
+    twelveFoot: 34, // 一番外側の青
+    eightFoot: 22.5,
+    fourFoot: 12.5,
+    button: 4.5,
   },
   // ストーン半径(相対)
   stoneRadius: 3.4,
