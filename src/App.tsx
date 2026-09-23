@@ -325,6 +325,17 @@ export default function App() {
 
   return (
     <div className="app">
+      {/* 画面右上のカメラアイコン(写真から配置) */}
+      <button
+        type="button"
+        className="corner-cam-btn"
+        onClick={() => setShowPhoto(true)}
+        aria-label="写真から配置"
+        title="写真から配置"
+      >
+        📷
+      </button>
+
       {/* ① ヘッダー */}
       <header className="header">
         <div className="header-row">
@@ -380,7 +391,6 @@ export default function App() {
           previewStones={previewStones}
           onSelectStone={setSelectedStoneId}
           onLimitReached={handleLimitReached}
-          onCamera={() => setShowPhoto(true)}
         />
       </main>
 
