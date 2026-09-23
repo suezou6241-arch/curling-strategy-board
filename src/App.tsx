@@ -20,8 +20,6 @@ function stateFromBoard(b: Board): BoardState {
   return {
     stones: b.stones,
     shots: b.shots,
-    comment: b.comment,
-    shotTitle: b.shotTitle,
     end: b.end,
     hammer: b.hammer,
   };
@@ -50,7 +48,6 @@ export default function App() {
   const [selectedStoneId, setSelectedStoneId] = useState<string | null>(null);
   const [shotType, setShotType] = useState<ShotType>("draw");
   const [showBoards, setShowBoards] = useState(false);
-  const [showComment, setShowComment] = useState(false);
   const [savedBoards, setSavedBoards] = useState<Board[]>([]);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -142,8 +139,6 @@ export default function App() {
       direction,
       stones: state.stones,
       shots: state.shots,
-      comment: state.comment,
-      shotTitle: state.shotTitle,
       createdAt,
       updatedAt: new Date().toISOString(),
     };
@@ -337,9 +332,6 @@ export default function App() {
         <button className="tb" onClick={redo} disabled={!canRedo}>
           <span className="ico">↷</span>Redo
         </button>
-        <button className="tb" onClick={() => setShowComment(true)}>
-          <span className="ico">📝</span>作戦
-        </button>
         <button className="tb primary" onClick={handleSave}>
           <span className="ico">💾</span>保存
         </button>
@@ -373,7 +365,6 @@ export default function App() {
                         石{b.stones.length} 軌道{b.shots.length}
                       </span>
                       <small>{new Date(b.updatedAt).toLocaleString()}</small>
-                      {b.shotTitle && <small>作戦: {b.shotTitle}</small>}
                     </button>
                     <button
                       className="del-btn"
@@ -387,39 +378,6 @@ export default function App() {
               </ul>
             )}
             <button className="close-btn" onClick={() => setShowBoards(false)}>
-              閉じる
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 作戦コメントモーダル */}
-      {showComment && (
-        <div className="modal-backdrop" onClick={() => setShowComment(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2>作戦コメント</h2>
-            <label className="field">
-              作戦タイトル
-              <input
-                value={state.shotTitle}
-                onChange={(e) =>
-                  set((prev) => ({ ...prev, shotTitle: e.target.value }))
-                }
-                placeholder="例: センターガード"
-              />
-            </label>
-            <label className="field">
-              メモ
-              <textarea
-                rows={5}
-                value={state.comment}
-                onChange={(e) =>
-                  set((prev) => ({ ...prev, comment: e.target.value }))
-                }
-                placeholder="例: 相手の2投目が弱いので次にフリーズを狙う"
-              />
-            </label>
-            <button className="close-btn" onClick={() => setShowComment(false)}>
               閉じる
             </button>
           </div>

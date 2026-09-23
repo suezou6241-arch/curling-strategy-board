@@ -303,25 +303,6 @@ body {
 .empty {
   color: var(--muted);
 }
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: 12px;
-  font-size: 13px;
-  color: var(--muted);
-}
-.field input,
-.field textarea {
-  background: var(--panel-2);
-  border: 1px solid #1c5a45;
-  color: var(--text);
-  border-radius: 8px;
-  padding: 10px;
-  font-size: 15px;
-  font-family: inherit;
-  resize: vertical;
-}
 .close-btn {
   width: 100%;
   min-height: var(--btn-min);

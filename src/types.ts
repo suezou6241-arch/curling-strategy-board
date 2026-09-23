@@ -79,8 +79,6 @@ export interface Board {
   direction: Direction;
   stones: Stone[];
   shots: Shot[];
-  comment: string;
-  shotTitle: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -89,8 +87,6 @@ export interface Board {
 export interface BoardState {
   stones: Stone[];
   shots: Shot[];
-  comment: string;
-  shotTitle: string;
   end: number;
   hammer: Hammer;
 }
@@ -112,8 +108,6 @@ export function createEmptyBoard(): Board {
     direction: "down",
     stones: [],
     shots: [],
-    comment: "",
-    shotTitle: "",
     createdAt: now,
     updatedAt: now,
   };
