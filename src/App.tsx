@@ -227,6 +227,7 @@ export default function App() {
             options={teamNames}
             onRemoveOption={handleRemoveTeamName}
             ariaLabel="自チーム名"
+            variant="own"
           />
           <span className="vs">vs</span>
           <TeamNameInput
@@ -235,6 +236,7 @@ export default function App() {
             options={teamNames}
             onRemoveOption={handleRemoveTeamName}
             ariaLabel="対戦相手名"
+            variant="opp"
           />
         </div>
         <div className="header-row">

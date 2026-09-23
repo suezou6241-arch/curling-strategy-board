@@ -86,6 +86,27 @@ body {
 .team-dropdown-btn:disabled {
   opacity: 0.4;
 }
+
+/* チーム名を石の色に合わせる */
+.team-name.own .team-input {
+  border-color: var(--own);
+  border-left: 4px solid var(--own);
+}
+.team-name.own .team-dropdown-btn {
+  border-color: var(--own);
+  color: var(--own);
+}
+.team-name.opp .team-input {
+  border-color: var(--opp);
+  border-left: 4px solid var(--opp);
+}
+.team-name.opp .team-dropdown-btn {
+  border-color: var(--opp);
+  color: var(--opp);
+}
+.team-name .team-input:focus {
+  outline: none;
+}
 .team-options {
   position: absolute;
   top: calc(100% + 4px);

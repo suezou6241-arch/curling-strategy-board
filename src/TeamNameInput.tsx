@@ -8,6 +8,8 @@ interface Props {
   // 履歴から削除
   onRemoveOption: (name: string) => void;
   ariaLabel: string;
+  // 石の色に合わせた見た目(own=赤 / opp=黄)
+  variant: "own" | "opp";
 }
 
 // チーム名の入力欄 + 履歴ドロップダウン(選択・削除可能)のコンボボックス。
@@ -17,6 +19,7 @@ export function TeamNameInput({
   options,
   onRemoveOption,
   ariaLabel,
+  variant,
 }: Props) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -39,7 +42,7 @@ export function TeamNameInput({
   }
 
   return (
-    <div className="team-name" ref={rootRef}>
+    <div className={`team-name ${variant}`} ref={rootRef}>
       <input
         className="team-input"
         value={value}
