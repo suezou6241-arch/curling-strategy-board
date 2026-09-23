@@ -73,3 +73,31 @@ curling-app/
 ## 今後の拡張(仕様書の将来実装)
 
 画像出力、URL / QR 共有、クラウド保存、テンプレート、試合モード、振り返り、AI 作戦支援。
+
+## 公開URL (GitHub Pages / PWA)
+
+本番URL: https://suezou6241-arch.github.io/curling-strategy-board/
+
+- GitHub Pages で HTTPS 配信しているため、PWA(Service Worker)が有効になり、
+  一度アクセスすればオフラインでも起動・動作します。
+- スマホでこの URL を開き、ブラウザメニューから「ホーム画面に追加」すると、
+  アイコンから全画面アプリとして起動できます(縦画面固定)。
+
+### 更新のデプロイ
+
+`main` ブランチに push すると、GitHub Actions(`.github/workflows/deploy.yml`)が
+自動でビルドし、GitHub Pages に反映します。
+
+```bash
+git add -A
+git commit -m "変更内容"
+git push
+```
+
+### PWA アイコンの再生成
+
+アイコンの元データは `icon-src.svg`。変更したら以下で PNG を再生成します。
+
+```bash
+node gen-icons.mjs
+```
