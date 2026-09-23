@@ -31,6 +31,8 @@ import { ConditionModal } from "./strategy/ConditionModal";
 import { ResultModal } from "./strategy/ResultModal";
 import { SettingsModal } from "./strategy/SettingsModal";
 import { requestStrategy, StrategyError } from "./strategy/client";
+import { PhotoModal } from "./vision/PhotoModal";
+import type { DetectedStone } from "./vision/types";
 import {
   computeRemainingStones,
   type StrategyConditions,
@@ -83,6 +85,9 @@ export default function App() {
     null
   );
   const [showAiSettings, setShowAiSettings] = useState(false);
+
+  // --- 写真からの配置自動生成機能 ---
+  const [showPhoto, setShowPhoto] = useState(false);
 
   const flash = useCallback((msg: string) => {
     setToast(msg);
@@ -290,6 +295,21 @@ export default function App() {
     flash(`「${p.title}」をボードに表示しました`);
   }
 
+  // 写真解析で確認・修正した配置を作戦ボードへ反映する(仕様 9)。
+  // 既存の配置を、検出したストーンで置き換える。軌道はそのまま残す。
+  function adoptDetectedStones(detected: DetectedStone[]) {
+    const stones: Stone[] = detected.map((d) => ({
+      id: newId("stone"),
+      team: d.team,
+      x: d.x,
+      y: d.y,
+    }));
+    set((prev) => ({ ...prev, stones }));
+    setSelectedStoneId(null);
+    setShowPhoto(false);
+    flash(`${stones.length}個のストーンを配置しました`);
+  }
+
   // キーボードショートカット(PC確認用)
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -360,6 +380,7 @@ export default function App() {
           previewStones={previewStones}
           onSelectStone={setSelectedStoneId}
           onLimitReached={handleLimitReached}
+          onCamera={() => setShowPhoto(true)}
         />
       </main>
 
@@ -518,6 +539,18 @@ export default function App() {
             setStrategyResult(null);
           }}
           onApply={applyProposal}
+        />
+      )}
+
+      {/* 写真から配置 */}
+      {showPhoto && (
+        <PhotoModal
+          onClose={() => setShowPhoto(false)}
+          onAdopt={adoptDetectedStones}
+          onOpenSettings={() => {
+            setShowPhoto(false);
+            setShowAiSettings(true);
+          }}
         />
       )}
 

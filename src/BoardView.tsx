@@ -26,6 +26,8 @@ interface Props {
   previewStones: (updater: (prev: Stone[]) => Stone[]) => void;
   onSelectStone: (id: string | null) => void;
   onLimitReached: (team: Team) => void;
+  // ハウス右上のカメラアイコン押下(写真から配置)。
+  onCamera?: () => void;
 }
 
 // クライアント座標を SVG の論理座標(0-100, down基準)へ変換
@@ -55,6 +57,7 @@ export function BoardView({
   previewStones,
   onSelectStone,
   onLimitReached,
+  onCamera,
 }: Props) {
   const svgRef = useRef<SVGSVGElement | null>(null);
   // ドラッグ中のストーン
@@ -275,6 +278,28 @@ export function BoardView({
           );
         })}
       </g>
+
+      {/* ハウス右上のカメラアイコン(写真から配置)。回転の影響を受けず常に正立・右上固定。 */}
+      {onCamera && (
+        <g
+          className="house-cam"
+          transform="translate(74 16)"
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            onCamera();
+          }}
+          style={{ cursor: "pointer" }}
+          role="button"
+          aria-label="写真から配置"
+        >
+          <circle r={6.2} fill="#10261f" stroke="#3fae86" strokeWidth={0.8} />
+          {/* カメラ本体 */}
+          <rect x={-3.6} y={-1.9} width={7.2} height={4.8} rx={1} fill="#eef4f8" />
+          <rect x={-1.4} y={-2.9} width={2.8} height={1.3} rx={0.4} fill="#eef4f8" />
+          <circle cx={0} cy={0.5} r={1.7} fill="#10261f" />
+          <circle cx={0} cy={0.5} r={0.9} fill="#3fae86" />
+        </g>
+      )}
 
       {/* 矢印マーカー定義(ショット種別ごとに色付き) */}
       <defs>
