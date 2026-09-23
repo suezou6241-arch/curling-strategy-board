@@ -41,28 +41,119 @@ export function fileToDataUrl(file: File): Promise<string> {
   });
 }
 
-// 大きすぎる画像はAPI負荷/レスポンス低下を招くため、長辺を縮小して JPEG 化する。
+// スマホの写真は高解像度(数千万画素)のため、そのまま base64 化して <img> に
+// デコードするとメモリを大量消費し「メモリ不足」でクラッシュする。
+// createImageBitmap の resize 指定でブラウザ側に効率よく縮小させ、
+// フルサイズのビットマップを一切保持しないようにする。base64 の中間生成も避ける。
 export async function downscaleImage(
   file: File,
-  maxEdge = 1280,
-  quality = 0.82
+  maxEdge = 1024,
+  quality = 0.8
 ): Promise<string> {
+  // 1) 最優先: createImageBitmap の resizeWidth/Height で直接縮小デコード。
+  if (typeof createImageBitmap === "function") {
+    try {
+      return await downscaleViaImageBitmap(file, maxEdge, quality);
+    } catch {
+      // 次の方式へフォールバック
+    }
+  }
+
+  // 2) フォールバック: object URL 経由で <img> にデコード → canvas 縮小。
+  //    (base64 展開を避けるため object URL を使う)
   try {
-    const dataUrl = await fileToDataUrl(file);
-    const img = await loadImage(dataUrl);
-    const scale = Math.min(1, maxEdge / Math.max(img.width, img.height));
-    if (scale >= 1) return dataUrl; // 縮小不要
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.round(img.width * scale);
-    canvas.height = Math.round(img.height * scale);
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return dataUrl;
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL("image/jpeg", quality);
+    return await downscaleViaObjectUrl(file, maxEdge, quality);
   } catch {
-    // 縮小に失敗しても元画像で続行できるようにする
+    // 3) 最終フォールバック: 元画像をそのまま base64 で返す(縮小できない環境向け)。
     return fileToDataUrl(file);
   }
+}
+
+async function downscaleViaImageBitmap(
+  file: File,
+  maxEdge: number,
+  quality: number
+): Promise<string> {
+  // まず寸法だけ得るため等倍の bitmap を作る…のは重いので、
+  // 一旦 1x で作って寸法を測り、大きければ resize 付きで作り直す。
+  let probe = await createImageBitmap(file);
+  const longEdge = Math.max(probe.width, probe.height);
+  const scale = Math.min(1, maxEdge / longEdge);
+
+  let bitmap = probe;
+  if (scale < 1) {
+    const targetW = Math.max(1, Math.round(probe.width * scale));
+    const targetH = Math.max(1, Math.round(probe.height * scale));
+    probe.close?.();
+    bitmap = await createImageBitmap(file, {
+      resizeWidth: targetW,
+      resizeHeight: targetH,
+      resizeQuality: "high",
+    });
+  }
+
+  try {
+    return await bitmapToJpegDataUrl(bitmap, quality);
+  } finally {
+    bitmap.close?.();
+  }
+}
+
+async function bitmapToJpegDataUrl(
+  bitmap: ImageBitmap,
+  quality: number
+): Promise<string> {
+  const w = bitmap.width;
+  const h = bitmap.height;
+
+  // OffscreenCanvas があればそれを使う(メインスレッドのDOM負荷を避ける)。
+  if (typeof OffscreenCanvas !== "undefined") {
+    const off = new OffscreenCanvas(w, h);
+    const ctx = off.getContext("2d");
+    if (ctx) {
+      ctx.drawImage(bitmap, 0, 0);
+      const blob = await off.convertToBlob({ type: "image/jpeg", quality });
+      return await blobToDataUrl(blob);
+    }
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("no 2d context");
+  ctx.drawImage(bitmap, 0, 0);
+  return canvas.toDataURL("image/jpeg", quality);
+}
+
+async function downscaleViaObjectUrl(
+  file: File,
+  maxEdge: number,
+  quality: number
+): Promise<string> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await loadImage(url);
+    const scale = Math.min(1, maxEdge / Math.max(img.width, img.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(img.width * scale));
+    canvas.height = Math.max(1, Math.round(img.height * scale));
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("no 2d context");
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", quality);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+function blobToDataUrl(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
 }
 
 function loadImage(src: string): Promise<HTMLImageElement> {
