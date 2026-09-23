@@ -1,7 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { BoardView, type Tool } from "./BoardView";
 import { useHistory } from "./useHistory";
-import { deleteBoard, listBoards, saveBoard } from "./storage";
+import {
+  addTeamName,
+  deleteBoard,
+  listBoards,
+  listTeamNames,
+  removeTeamName,
+  saveBoard,
+} from "./storage";
+import { TeamNameInput } from "./TeamNameInput";
 import {
   createEmptyBoard,
   MAX_STONES_PER_TEAM,
@@ -50,6 +58,7 @@ export default function App() {
   const [showBoards, setShowBoards] = useState(false);
   const [savedBoards, setSavedBoards] = useState<Board[]>([]);
   const [toast, setToast] = useState<string | null>(null);
+  const [teamNames, setTeamNames] = useState<string[]>(() => listTeamNames());
 
   const flash = useCallback((msg: string) => {
     setToast(msg);
@@ -146,7 +155,16 @@ export default function App() {
 
   function handleSave() {
     saveBoard(buildBoard());
+    // 使ったチーム名を履歴に追加
+    addTeamName(team);
+    addTeamName(opponent);
+    setTeamNames(listTeamNames());
     flash("局面を保存しました");
+  }
+
+  function handleRemoveTeamName(name: string) {
+    removeTeamName(name);
+    setTeamNames(listTeamNames());
   }
 
   function openBoards() {
@@ -203,18 +221,20 @@ export default function App() {
       {/* ① ヘッダー */}
       <header className="header">
         <div className="header-row">
-          <input
-            className="team-input"
+          <TeamNameInput
             value={team}
-            onChange={(e) => setTeam(e.target.value)}
-            aria-label="自チーム名"
+            onChange={setTeam}
+            options={teamNames}
+            onRemoveOption={handleRemoveTeamName}
+            ariaLabel="自チーム名"
           />
           <span className="vs">vs</span>
-          <input
-            className="team-input"
+          <TeamNameInput
             value={opponent}
-            onChange={(e) => setOpponent(e.target.value)}
-            aria-label="対戦相手名"
+            onChange={setOpponent}
+            options={teamNames}
+            onRemoveOption={handleRemoveTeamName}
+            ariaLabel="対戦相手名"
           />
         </div>
         <div className="header-row">

@@ -51,3 +51,35 @@ export function deleteBoard(id: string): void {
   store.boards = store.boards.filter((b) => b.id !== id);
   write(store);
 }
+
+// --- チーム名の履歴 ---
+// 自チーム/相手を区別せず、過去に使ったチーム名を共通リストとして保持する。
+const TEAM_NAMES_KEY = "curling_team_names_v1";
+
+export function listTeamNames(): string[] {
+  try {
+    const raw = localStorage.getItem(TEAM_NAMES_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((v): v is string => typeof v === "string");
+  } catch {
+    return [];
+  }
+}
+
+function writeTeamNames(names: string[]): void {
+  localStorage.setItem(TEAM_NAMES_KEY, JSON.stringify(names));
+}
+
+// 名前を履歴に追加(重複は除き、最近使ったものを先頭に)。空文字は無視。
+export function addTeamName(name: string): void {
+  const trimmed = name.trim();
+  if (!trimmed) return;
+  const current = listTeamNames().filter((n) => n !== trimmed);
+  writeTeamNames([trimmed, ...current].slice(0, 50));
+}
+
+export function removeTeamName(name: string): void {
+  writeTeamNames(listTeamNames().filter((n) => n !== name));
+}
