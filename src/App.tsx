@@ -228,7 +228,7 @@ export default function App() {
             </button>
           </div>
           <button className="chip" onClick={toggleHammer}>
-            {state.hammer === "own" ? "後攻(ハンマー)" : "先攻"}
+            {state.hammer === "own" ? "後攻" : "先攻"}
           </button>
           <button className="chip" onClick={flipDirection}>
             投球方向 {direction === "down" ? "↓" : "↑"}
