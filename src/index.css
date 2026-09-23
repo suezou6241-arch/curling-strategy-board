@@ -109,6 +109,7 @@ body {
   flex: 0 0 auto;
 }
 .team-btn {
+  padding: 0 4px;
   flex: 1;
   min-height: var(--btn-min);
   border-radius: 10px;

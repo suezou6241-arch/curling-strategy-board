@@ -22,6 +22,17 @@ export function SheetBackground() {
       {/* 氷面 */}
       <rect x={left} y={0} width={right - left} height={100} fill="#eef4f8" />
 
+      {/* フリーガードゾーン(ティーライン〜ホグラインの帯)を薄く塗って明示。
+          ハウスの円はこの上に重ねて描かれる。 */}
+      <rect
+        x={left}
+        y={teeLineTop}
+        width={right - left}
+        height={hogLineTop - teeLineTop}
+        fill="#ffe9a8"
+        opacity={0.4}
+      />
+
       {/* ハウス(遠端側) 外周から内周へ */}
       <circle
         cx={houseCenterX}
@@ -106,12 +117,13 @@ export function SheetBackground() {
       {/* フリーガードゾーンのラベル(ハウス外周〜ホグラインの間、ハウスに重ならない位置) */}
       <text
         x={50}
-        y={(houseCenterY + houseRadii.twelveFoot + hogLineTop) / 2 + 0.6}
+        y={(houseCenterY + houseRadii.twelveFoot + hogLineTop) / 2 + 1}
         textAnchor="middle"
-        fontSize={1.8}
-        fill="#8aa0b0"
+        fontSize={3}
+        fontWeight={600}
+        fill="#c99a2e"
       >
-        FGZ
+        フリーガードゾーン
       </text>
     </g>
   );

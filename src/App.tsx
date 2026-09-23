@@ -236,22 +236,6 @@ export default function App() {
         </div>
       </header>
 
-      {/* チーム選択(石を置く対象) */}
-      <div className="team-toggle">
-        <button
-          className={`team-btn own ${activeTeam === "own" ? "active" : ""}`}
-          onClick={() => setActiveTeam("own")}
-        >
-          自チーム(赤) {ownCount}/{MAX_STONES_PER_TEAM}
-        </button>
-        <button
-          className={`team-btn opp ${activeTeam === "opp" ? "active" : ""}`}
-          onClick={() => setActiveTeam("opp")}
-        >
-          相手(黄) {oppCount}/{MAX_STONES_PER_TEAM}
-        </button>
-      </div>
-
       {/* ② カーリングシート */}
       <main className="sheet-area">
         <BoardView
@@ -312,6 +296,24 @@ export default function App() {
             ))}
           </select>
           <span className="hint">ドラッグで軌道を描画(種別ごとに色分け)</span>
+        </div>
+      )}
+
+      {/* チーム選択(石を置くモード時のみ) */}
+      {tool === "stone" && (
+        <div className="team-toggle">
+          <button
+            className={`team-btn own ${activeTeam === "own" ? "active" : ""}`}
+            onClick={() => setActiveTeam("own")}
+          >
+            自チーム(赤) {ownCount}/{MAX_STONES_PER_TEAM}
+          </button>
+          <button
+            className={`team-btn opp ${activeTeam === "opp" ? "active" : ""}`}
+            onClick={() => setActiveTeam("opp")}
+          >
+            相手(黄) {oppCount}/{MAX_STONES_PER_TEAM}
+          </button>
         </div>
       )}
 
