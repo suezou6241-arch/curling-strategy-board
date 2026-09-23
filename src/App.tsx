@@ -4,6 +4,7 @@ import { useHistory } from "./useHistory";
 import { deleteBoard, listBoards, saveBoard } from "./storage";
 import {
   createEmptyBoard,
+  MAX_STONES_PER_TEAM,
   SHOT_LABELS,
   type Board,
   type BoardState,
@@ -56,6 +57,19 @@ export default function App() {
     setToast(msg);
     window.setTimeout(() => setToast(null), 1800);
   }, []);
+
+  // チームごとの石数(各チーム最大8個)
+  const ownCount = state.stones.filter((s) => s.team === "own").length;
+  const oppCount = state.stones.filter((s) => s.team === "opp").length;
+
+  const handleLimitReached = useCallback(
+    (team: Team) => {
+      flash(
+        `${team === "own" ? "自チーム" : "相手"}の石は${MAX_STONES_PER_TEAM}個までです`
+      );
+    },
+    [flash]
+  );
 
   // --- 局面状態の更新ヘルパ ---
   const commitStones = useCallback(
@@ -232,13 +246,13 @@ export default function App() {
           className={`team-btn own ${activeTeam === "own" ? "active" : ""}`}
           onClick={() => setActiveTeam("own")}
         >
-          自チーム(赤)
+          自チーム(赤) {ownCount}/{MAX_STONES_PER_TEAM}
         </button>
         <button
           className={`team-btn opp ${activeTeam === "opp" ? "active" : ""}`}
           onClick={() => setActiveTeam("opp")}
         >
-          相手(黄)
+          相手(黄) {oppCount}/{MAX_STONES_PER_TEAM}
         </button>
       </div>
 
@@ -256,6 +270,7 @@ export default function App() {
           commitShots={commitShots}
           previewStones={previewStones}
           onSelectStone={setSelectedStoneId}
+          onLimitReached={handleLimitReached}
         />
       </main>
 

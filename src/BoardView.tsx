@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { SheetBackground } from "./Sheet";
 import { SHEET, clamp, toLogical } from "./geometry";
 import type { Direction, Point, Shot, ShotType, Stone, Team } from "./types";
-import { newId } from "./types";
+import { MAX_STONES_PER_TEAM, newId } from "./types";
 
 export type Tool = "stone" | "shot" | "select";
 
@@ -20,6 +20,7 @@ interface Props {
   // ドラッグ中のプレビュー(履歴に積まない)
   previewStones: (updater: (prev: Stone[]) => Stone[]) => void;
   onSelectStone: (id: string | null) => void;
+  onLimitReached: (team: Team) => void;
 }
 
 // クライアント座標を SVG の論理座標(0-100, down基準)へ変換
@@ -48,6 +49,7 @@ export function BoardView({
   commitShots,
   previewStones,
   onSelectStone,
+  onLimitReached,
 }: Props) {
   const svgRef = useRef<SVGSVGElement | null>(null);
   // ドラッグ中のストーン
@@ -95,6 +97,12 @@ export function BoardView({
     const p = clientToLogical(svgRef.current, e.clientX, e.clientY, direction);
 
     if (tool === "stone") {
+      // 各チーム最大8個まで
+      const count = stones.filter((s) => s.team === activeTeam).length;
+      if (count >= MAX_STONES_PER_TEAM) {
+        onLimitReached(activeTeam);
+        return;
+      }
       const stone: Stone = { id: newId("stone"), team: activeTeam, x: p.x, y: p.y };
       commitStones((prev) => [...prev, stone]);
       onSelectStone(stone.id);

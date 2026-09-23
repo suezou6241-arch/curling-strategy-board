@@ -4,6 +4,9 @@
 //   y: 0=シート上端(遠いハウス側/ハック), 100=シート下端(投球側)
 // direction が "up" のときは表示上 180 度回転して描画するが、保存データの座標は常に "down" 基準の論理座標で持つ。
 
+// 1チームがシート上に置ける石の最大数(カーリングのルール)
+export const MAX_STONES_PER_TEAM = 8;
+
 export type Team = "own" | "opp";
 export type Direction = "down" | "up";
 export type Hammer = "own" | "opp";
