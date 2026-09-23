@@ -30,6 +30,28 @@ export const SHOT_LABELS: Record<ShotType, string> = {
   runback: "ランバック",
 };
 
+// ショット種別ごとの軌道の色。種別を視覚的に区別する。
+export const SHOT_COLORS: Record<ShotType, string> = {
+  draw: "#2f77c2", // ドロー: 青
+  guard: "#2ba84a", // ガード: 緑
+  takeout: "#e0392b", // テイクアウト: 赤
+  hitroll: "#e67e22", // ヒット&ロール: オレンジ
+  freeze: "#8e44ad", // フリーズ: 紫
+  comearound: "#16a3a3", // カムアラウンド: シアン
+  runback: "#c0392b", // ランバック: 濃い赤
+};
+
+// 短い記号ラベル(軌道上に添える)
+export const SHOT_SHORT: Record<ShotType, string> = {
+  draw: "DR",
+  guard: "GD",
+  takeout: "TO",
+  hitroll: "H&R",
+  freeze: "FRZ",
+  comearound: "CA",
+  runback: "RB",
+};
+
 export interface Point {
   x: number;
   y: number;

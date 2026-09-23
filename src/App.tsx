@@ -5,6 +5,7 @@ import { deleteBoard, listBoards, saveBoard } from "./storage";
 import {
   createEmptyBoard,
   MAX_STONES_PER_TEAM,
+  SHOT_COLORS,
   SHOT_LABELS,
   type Board,
   type BoardState,
@@ -299,6 +300,11 @@ export default function App() {
       {/* ショット種類(軌道モード時) */}
       {tool === "shot" && (
         <div className="shot-select">
+          <span
+            className="shot-swatch"
+            style={{ background: SHOT_COLORS[shotType] }}
+            aria-hidden="true"
+          />
           <select
             value={shotType}
             onChange={(e) => setShotType(e.target.value as ShotType)}
@@ -310,7 +316,7 @@ export default function App() {
               </option>
             ))}
           </select>
-          <span className="hint">シート上をドラッグして軌道を描画</span>
+          <span className="hint">ドラッグで軌道を描画(種別ごとに色分け)</span>
         </div>
       )}
 

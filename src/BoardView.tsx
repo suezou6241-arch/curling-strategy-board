@@ -2,7 +2,12 @@ import { useRef, useState } from "react";
 import { SheetBackground } from "./Sheet";
 import { SHEET, clamp, toLogical } from "./geometry";
 import type { Direction, Point, Shot, ShotType, Stone, Team } from "./types";
-import { MAX_STONES_PER_TEAM, newId } from "./types";
+import {
+  MAX_STONES_PER_TEAM,
+  newId,
+  SHOT_COLORS,
+  SHOT_SHORT,
+} from "./types";
 
 export type Tool = "stone" | "shot" | "select";
 
@@ -165,28 +170,60 @@ export function BoardView({
       >
         <SheetBackground />
 
-        {/* 投球軌道 */}
-        {shots.map((shot) => (
-          <g key={shot.id}>
-            <path
-              d={pointsToPath(shot.points)}
-              fill="none"
-              stroke="#1b6"
-              strokeWidth={0.9}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              markerEnd="url(#arrow)"
-            />
-          </g>
-        ))}
+        {/* 投球軌道(ショット種別ごとに色分け+ラベル) */}
+        {shots.map((shot) => {
+          const color = SHOT_COLORS[shot.type];
+          const start = shot.points[0];
+          return (
+            <g key={shot.id}>
+              <path
+                d={pointsToPath(shot.points)}
+                fill="none"
+                stroke={color}
+                strokeWidth={1}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                markerEnd={`url(#arrow-${shot.type})`}
+              />
+              {/* 始点に種別ラベル。回転時も文字が正立するよう打ち消し回転 */}
+              {start && (
+                <g
+                  transform={
+                    rotate ? `rotate(180 ${start.x} ${start.y})` : undefined
+                  }
+                >
+                  <rect
+                    x={start.x - 4}
+                    y={start.y - 5.6}
+                    width={8}
+                    height={4}
+                    rx={1}
+                    fill={color}
+                    opacity={0.9}
+                  />
+                  <text
+                    x={start.x}
+                    y={start.y - 2.7}
+                    textAnchor="middle"
+                    fontSize={2.6}
+                    fontWeight={700}
+                    fill="#fff"
+                  >
+                    {SHOT_SHORT[shot.type]}
+                  </text>
+                </g>
+              )}
+            </g>
+          );
+        })}
 
-        {/* 描画中の軌道プレビュー */}
+        {/* 描画中の軌道プレビュー(現在選択中の種別色) */}
         {drawingShot && drawingShot.length >= 2 && (
           <path
             d={pointsToPath(drawingShot)}
             fill="none"
-            stroke="#1b6"
-            strokeWidth={0.9}
+            stroke={SHOT_COLORS[currentShotType]}
+            strokeWidth={1}
             strokeDasharray="1.5 1.2"
             strokeLinecap="round"
           />
@@ -239,19 +276,22 @@ export function BoardView({
         })}
       </g>
 
-      {/* 矢印マーカー定義 */}
+      {/* 矢印マーカー定義(ショット種別ごとに色付き) */}
       <defs>
-        <marker
-          id="arrow"
-          viewBox="0 0 10 10"
-          refX="8"
-          refY="5"
-          markerWidth="4"
-          markerHeight="4"
-          orient="auto-start-reverse"
-        >
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#1b6" />
-        </marker>
+        {(Object.keys(SHOT_COLORS) as ShotType[]).map((t) => (
+          <marker
+            key={t}
+            id={`arrow-${t}`}
+            viewBox="0 0 10 10"
+            refX="8"
+            refY="5"
+            markerWidth="4"
+            markerHeight="4"
+            orient="auto-start-reverse"
+          >
+            <path d="M 0 0 L 10 5 L 0 10 z" fill={SHOT_COLORS[t]} />
+          </marker>
+        ))}
       </defs>
     </svg>
   );
